@@ -15,4 +15,9 @@ public class Day1Test {
         assertThat(Day1.frequency(Stream.of(1, -2, 3, 1)), is(3));
     }
 
+    @Test
+    public void testFirstDuplicateFrequency() {
+        assertThat(Day1.findFirstDuplicateFrequency(Stream.of(1, -2, 3, 1)), is(2));
+    }
+
 }
