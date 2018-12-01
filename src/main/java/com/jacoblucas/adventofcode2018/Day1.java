@@ -40,4 +40,5 @@ public class Day1 {
     private static Stream<Integer> getInput() throws IOException {
         return Utils.read("day1.txt").map(Integer::valueOf);
     }
+
 }

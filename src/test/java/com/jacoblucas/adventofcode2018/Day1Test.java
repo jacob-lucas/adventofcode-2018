@@ -1,6 +1,5 @@
-package com.jacoblucas.adventofcode2018.utils.com.jacoblucas.adventofcode2018;
+package com.jacoblucas.adventofcode2018;
 
-import com.jacoblucas.adventofcode2018.Day1;
 import org.junit.Test;
 
 import java.util.stream.Stream;
