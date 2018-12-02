@@ -23,4 +23,17 @@ public class Day2Test {
         assertThat(Day2.checksum(boxIDs), is(12L));
     }
 
+    @Test
+    public void testFindCorrectBoxID() {
+        final Stream<String> boxIDs = Stream.of(
+                "abcde",
+                "fghij",
+                "klmno",
+                "pqrst",
+                "fguij",
+                "axcye",
+                "wvxyz");
+
+        assertThat(Day2.findCorrectBoxID(boxIDs), is("fgij"));
+    }
 }

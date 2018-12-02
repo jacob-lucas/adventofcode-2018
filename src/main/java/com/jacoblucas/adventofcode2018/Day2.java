@@ -4,6 +4,8 @@ import com.jacoblucas.adventofcode2018.utils.Utils;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -28,9 +30,30 @@ public class Day2 {
                 .containsValue(n);
     }
 
+    public static String findCorrectBoxID(final Stream<String> boxIDs) {
+        final List<String> boxIDList = boxIDs.collect(Collectors.toList());
+        return findCorrectBoxID(boxIDList, 0);
+    }
+
+    private static String findCorrectBoxID(final List<String> boxIDList, final int pos) {
+        final Optional<Map.Entry<String, Long>> first = boxIDList.stream()
+                .map(s -> s.substring(0, pos) + s.substring(pos + 1))
+                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
+                .entrySet()
+                .stream()
+                .filter(e -> e.getValue() == 2L)
+                .findFirst();
+
+        if (first.isPresent()) {
+            return first.get().getKey();
+        } else {
+            return findCorrectBoxID(boxIDList, pos + 1);
+        }
+    }
+
     public static void main(String[] args) throws IOException {
-        final Stream<String> input = Utils.read("day2.txt");
-        System.out.println(checksum(input));
+        System.out.println(checksum(Utils.read("day2.txt")));
+        System.out.println(findCorrectBoxID(Utils.read("day2.txt")));
     }
 
 }
