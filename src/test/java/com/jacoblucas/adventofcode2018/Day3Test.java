@@ -29,10 +29,24 @@ public class Day3Test {
                         "#1 @ 1,3: 4x4",
                         "#2 @ 3,1: 4x4",
                         "#3 @ 5,5: 2x2")
-                .map(Day3.Claim::parse)
-                .map(Optional::get);
+                        .map(Day3.Claim::parse)
+                        .map(Optional::get);
 
         assertThat(Day3.getOverlappingSquareInches(claims), is(4L));
+    }
+
+
+    @Test
+    public void testGetNonOverlappingClaim() {
+        final Stream<Day3.Claim> claims =
+                Stream.of(
+                        "#1 @ 1,3: 4x4",
+                        "#2 @ 3,1: 4x4",
+                        "#3 @ 5,5: 2x2")
+                        .map(Day3.Claim::parse)
+                        .map(Optional::get);
+
+        assertThat(Day3.getNonOverlappingClaim(claims).getId(), is(3));
     }
 
 }
