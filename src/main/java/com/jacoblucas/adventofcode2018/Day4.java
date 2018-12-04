@@ -97,13 +97,8 @@ public class Day4 {
             } else if (recordedAction.contains("falls asleep")) {
                 asleepTime = record.timestamp;
             } else if (recordedAction.contains("wakes up")) {
-                final List<Integer> minutesRange = IntStream.
-                        range(asleepTime.getMinuteOfHour(), record.timestamp.getMinuteOfHour())
-                        .boxed()
-                        .collect(Collectors.toList());
-
                 final List<Integer> minutesAsleep = guardIdAsleepMinutes.getOrDefault(guardId, new ArrayList<>());
-                minutesAsleep.addAll(minutesRange);
+                IntStream.range(asleepTime.getMinuteOfHour(), record.timestamp.getMinuteOfHour()).forEach(minutesAsleep::add);
                 minutesAsleep.sort(Integer::compareTo);
                 guardIdAsleepMinutes.put(guardId, minutesAsleep);
             }
