@@ -116,8 +116,7 @@ public class Day4 {
         final List<Record> sortedRecords =
                 Utils.read("day4.txt")
                         .map(Record::parse)
-                        .filter(Optional::isPresent)
-                        .map(Optional::get)
+                        .flatMap(Optional::stream)
                         .sorted(Record::compareTo)
                         .collect(Collectors.toList());
 
