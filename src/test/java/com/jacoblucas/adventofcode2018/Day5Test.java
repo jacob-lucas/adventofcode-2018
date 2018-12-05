@@ -35,4 +35,8 @@ public class Day5Test {
         assertThat(Day5.fullyReact(unitList("dabAcCaCBAcCcaDA")), is("dabCBAcaDA"));
     }
 
+    @Test
+    public void testOptimalFullyReact() {
+        assertThat(Day5.optimalFullyReact(unitList("dabAcCaCBAcCcaDA")), is("daDA"));
+    }
 }

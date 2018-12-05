@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.io.IOException;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -41,6 +42,16 @@ public class Day5 {
                 .collect(Collectors.joining());
     }
 
+    public static String optimalFullyReact(final List<Unit> polymer) {
+        return polymer.stream()
+                .map(unit -> Character.toUpperCase(unit.getType()))
+                .distinct() // find the distinct character set
+                .map(ch -> polymer.stream().filter(u -> Character.toUpperCase(u.getType()) != ch)) // streams of the polymer with each char removed
+                .map(unitStream -> fullyReact(unitStream.collect(Collectors.toList()))) // fully react each stream
+                .min(Comparator.comparingInt(String::length)) // find the shortest one
+                .get();
+    }
+
     static boolean react(final List<Unit> polymer) {
         for (int i = 0; i < polymer.size() - 1; i++) {
             final Unit unit = polymer.get(i);
@@ -62,6 +73,7 @@ public class Day5 {
         final List<Unit> polymer = unitList(Utils.read("day5.txt").iterator().next());
 
         System.out.println(fullyReact(polymer).length());
+        System.out.println(optimalFullyReact(polymer).length());
     }
 
 }
