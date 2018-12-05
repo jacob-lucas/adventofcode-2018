@@ -29,6 +29,10 @@ public class Day5 {
                     .type((char) ch)
                     .build();
         }
+
+        static List<Unit> parse(final String str) {
+            return str.chars().mapToObj(Unit::parse).collect(Collectors.toList());
+        }
     }
 
     public static String fullyReact(final List<Unit> polymer) {
@@ -65,12 +69,8 @@ public class Day5 {
         return false;
     }
 
-    static List<Day5.Unit> unitList(final String input) {
-        return input.chars().mapToObj(Day5.Unit::parse).collect(Collectors.toList());
-    }
-
     public static void main(String[] args) throws IOException {
-        final List<Unit> polymer = unitList(Utils.read("day5.txt").iterator().next());
+        final List<Unit> polymer = Unit.parse(Utils.read("day5.txt").iterator().next());
 
         System.out.println(fullyReact(polymer).length());
         System.out.println(optimalFullyReact(polymer).length());
