@@ -24,14 +24,12 @@ public class Day5 {
             return Character.toUpperCase(type) == Character.toUpperCase(that.type) && polarity() != that.polarity();
         }
 
-        static Unit parse(final int ch) {
-            return Unit.builder()
-                    .type((char) ch)
-                    .build();
-        }
-
         static List<Unit> parse(final String str) {
-            return str.chars().mapToObj(Unit::parse).collect(Collectors.toList());
+            return str.chars()
+                    .mapToObj(ch -> Unit.builder()
+                            .type((char) ch)
+                            .build())
+                    .collect(Collectors.toList());
         }
     }
 
