@@ -43,6 +43,22 @@ public class Day6 {
         return Collections.max(finiteAreaMap, Map.Entry.comparingByValue()).getValue();
     }
 
+    public static int areaNearMostCoordinates(final List<Coordinate> coordinates, final int cap) {
+        final int gridSize = gridSize(coordinates);
+        int areaNear = 0;
+        for (int y = 0; y < gridSize; y++) {
+            for (int x = 0; x < gridSize; x++) {
+                final Coordinate coordinate = new Coordinate(x, y);
+                if (coordinates.stream()
+                        .mapToInt(c -> c.manhattanDistance(coordinate))
+                        .sum() < cap) {
+                    areaNear++;
+                }
+            }
+        }
+        return areaNear;
+    }
+
     private static int gridSize(final List<Coordinate> coordinates) {
         final int maxX = coordinates.stream()
                 .max(Comparator.comparingInt(Coordinate::getX))
@@ -81,5 +97,6 @@ public class Day6 {
                 .collect(Collectors.toList());
 
         System.out.println(Day6.largestFiniteArea(coordinates));
+        System.out.println(Day6.areaNearMostCoordinates(coordinates, 10000));
     }
 }

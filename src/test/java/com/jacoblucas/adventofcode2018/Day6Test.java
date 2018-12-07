@@ -43,4 +43,9 @@ public class Day6Test {
         assertThat(Day6.largestFiniteArea(coordinates), is(17));
     }
 
+    @Test
+    public void testAreaNearMostCoordinates() {
+        assertThat(Day6.areaNearMostCoordinates(coordinates, 32), is(16));
+    }
+
 }
