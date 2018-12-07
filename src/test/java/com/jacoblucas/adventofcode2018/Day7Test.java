@@ -24,4 +24,9 @@ public class Day7Test {
     public void testStepOrder() {
         assertThat(Day7.stepOrder(parse(instructions)), is("CABDFE"));
     }
+
+    @Test
+    public void testExecutionTime() {
+        assertThat(Day7.executionTime(parse(instructions), 2, 0), is(15));
+    }
 }
