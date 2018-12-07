@@ -1,7 +1,7 @@
 package com.jacoblucas.adventofcode2018;
 
+import com.jacoblucas.adventofcode2018.common.Coordinate;
 import com.jacoblucas.adventofcode2018.utils.Utils;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
@@ -16,12 +16,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class Day3 {
-
-    @Data
-    @AllArgsConstructor
-    static class Coordinate {
-        int x, y;
-    }
 
     @Data
     @Builder
