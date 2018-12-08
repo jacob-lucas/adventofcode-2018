@@ -6,7 +6,11 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -71,7 +75,7 @@ public class Day7 {
                 .collect(Collectors.joining());
     }
 
-    public static int executionTime(Map<String, Instruction> instructionMap, int numWorkers, int base) {
+    public static int executionTime(final Map<String, Instruction> instructionMap, final int numWorkers, final int base) {
         int tick = 0;
         final Map<Integer, List<String>> completionTimeMap = new HashMap<>();
         final List<Worker> workers = IntStream.range(0, numWorkers)
@@ -82,7 +86,7 @@ public class Day7 {
         while (true) {
             // check for any tasks that need completing and free up the worker
             if (completionTimeMap.containsKey(tick)) {
-                List<String> completedInstructions = completionTimeMap.get(tick);
+                final List<String> completedInstructions = completionTimeMap.get(tick);
                 completedInstructions.forEach(id -> {
                     instructionMap.get(id).execute();
                     workers.forEach(w -> {
@@ -104,7 +108,7 @@ public class Day7 {
             for (final Instruction instruction : nextInstructions) {
                 // only assign this instruction if it's not being worked on
                 if (workers.stream().noneMatch(w -> w.getAssignedInstructionId().equals(instruction.id))) {
-                    int now = tick;
+                    final int now = tick;
                     final Optional<Worker> availableWorker = workers.stream().filter(w -> w.isAvailable(now)).findFirst();
                     if (availableWorker.isPresent()) {
                         // assign to this worker
