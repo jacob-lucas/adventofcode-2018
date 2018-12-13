@@ -33,4 +33,9 @@ public class Day8Test {
         assertThat(a.getMetadataSum(), is(138));
     }
 
+    @Test
+    public void testGetValue() {
+        assertThat(a.getValue(), is(66));
+    }
+
 }

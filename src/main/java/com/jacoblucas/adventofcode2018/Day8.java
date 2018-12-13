@@ -23,6 +23,19 @@ public class Day8 {
         public int getMetadataSum() {
             return metadata.stream().mapToInt(Integer::intValue).sum() + children.stream().mapToInt(Node::getMetadataSum).sum();
         }
+
+        public int getValue() {
+            if (children.isEmpty()) {
+                return getMetadataSum();
+            } else {
+                return metadata.stream()
+                        .mapToInt(m -> {
+                            int index = m - 1;
+                            return index >= 0 && index < children.size() ? children.get(index).getValue() : 0;
+                        })
+                        .sum();
+            }
+        }
     }
 
     static List<Node> parse(final IntStream numbers) {
@@ -64,6 +77,7 @@ public class Day8 {
 
         final Node root = nodes.get(0);
         System.out.println(root.getMetadataSum());
+        System.out.println(root.getValue());
     }
 
 }
