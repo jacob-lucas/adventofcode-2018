@@ -11,9 +11,9 @@ import java.util.stream.IntStream;
 
 public class Day9 {
 
-    public static int getHighScore(final int numPlayers, final int lastMarbleWorth) {
-        final Map<Integer, Integer> scoreMap = new HashMap<>();
-        IntStream.range(1, numPlayers+1).forEach(i -> scoreMap.put(i, 0));
+    public static long getHighScore(final int numPlayers, final int lastMarbleWorth) {
+        final Map<Integer, Long> scoreMap = new HashMap<>();
+        IntStream.range(1, numPlayers+1).forEach(i -> scoreMap.put(i, 0L));
 
         final Vector<Integer> circle = new Vector<>();
         int currentMarbleIndex = 0;
@@ -59,7 +59,7 @@ public class Day9 {
             }
         }
 
-        return scoreMap.values().stream().max(Integer::compareTo).get();
+        return scoreMap.values().stream().max(Long::compareTo).get();
     }
 
     public static void main(String[] args) throws IOException {
@@ -72,5 +72,6 @@ public class Day9 {
         final int lastMarbleWorth = Integer.valueOf(inputParts[6]);
 
         System.out.println(getHighScore(numPlayers, lastMarbleWorth));
+        System.out.println(getHighScore(numPlayers, lastMarbleWorth * 100)); // takes about an hour to run :(
     }
 }
