@@ -18,7 +18,7 @@ public class Day11 {
         int getPowerLevel(final int serialNumber) {
             final int powerLevel = (getRackID() * y) + serialNumber;
             final String powerComputation = String.valueOf(powerLevel * getRackID());
-            return Integer.valueOf(""+powerComputation.charAt(powerComputation.length() - 3)) - 5;
+            return Character.getNumericValue(powerComputation.charAt(powerComputation.length() - 3)) - 5;
         }
     }
 
@@ -65,11 +65,31 @@ public class Day11 {
             }
             return power;
         }
+
+        public String getLargestTotalPowerIdentifier() {
+            int maxPower = Integer.MIN_VALUE;
+            FuelCellCoordinate maxPowerCoordinate = null;
+            int maxPowerSquareSize = 1;
+            for (int squareSize = 1; squareSize <= grid.length; squareSize++) {
+                final FuelCellCoordinate coordinate = getLargestTotalPower(squareSize);
+                final int powerAtCoordinate = powerAt(coordinate, squareSize);
+
+                if (powerAtCoordinate > maxPower) {
+                    maxPower = powerAtCoordinate;
+                    maxPowerCoordinate = coordinate;
+                    maxPowerSquareSize = squareSize;
+                }
+            }
+
+            // this takes a long time to run... :(
+            return maxPowerCoordinate.getX() + "," + maxPowerCoordinate.getY() + "," + maxPowerSquareSize;
+        }
     }
 
     public static void main(String[] args) {
         final FuelCell fuelCell = new FuelCell(300, 9306);
         System.out.println(fuelCell.getLargestTotalPower(3));
+        System.out.println(fuelCell.getLargestTotalPowerIdentifier());
     }
 
 }
