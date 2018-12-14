@@ -140,6 +140,7 @@ public class Day10 {
                 .flatMap(Optional::stream)
                 .collect(Collectors.toList());
 
+        // the second printed out with this is the solution for part 2
         fastForwardTime(lights);
     }
 
