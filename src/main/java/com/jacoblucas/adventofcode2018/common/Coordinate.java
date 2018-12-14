@@ -8,7 +8,7 @@ import java.util.Optional;
 @Data
 @AllArgsConstructor
 public class Coordinate {
-    int x, y;
+    protected int x, y;
 
     @Override
     public String toString() {
