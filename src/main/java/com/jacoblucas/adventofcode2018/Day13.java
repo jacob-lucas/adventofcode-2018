@@ -138,23 +138,34 @@ public class Day13 {
         return tracks;
     }
 
-    public static TrackCoordinate findFirstCrashCoordinate(final TrackCoordinate[][] tracks) {
-        int tick = 0;
+    public static TrackCoordinate findFirstCrashCoordinate(final TrackCoordinate[][] tracks, final boolean removeCrashedCarts) {
         while (true) {
-            tick(tracks);
-
-            final Optional<TrackCoordinate> crash = Arrays.stream(tracks)
-                    .flatMap(Arrays::stream)
-                    .filter(c -> c.trackType == TrackType.CRASH)
-                    .findFirst();
-
+            final Optional<TrackCoordinate> crash = tick(tracks, removeCrashedCarts);
             if (crash.isPresent()) {
-                printTracks(tick, tracks);
+                printTracks(tracks);
                 return crash.get();
-            } else {
-                tick++;
             }
         }
+    }
+
+    public static TrackCoordinate lastCartLocation(final TrackCoordinate[][] tracks) {
+        while (getCartCount(tracks) > 1) {
+            findFirstCrashCoordinate(tracks, true);
+        }
+
+        // find the location of the last remaining car
+        return Arrays.stream(tracks)
+                .flatMap(Arrays::stream)
+                .filter(c -> c.cart != null)
+                .findFirst()
+                .get();
+    }
+
+    static long getCartCount(final TrackCoordinate[][] tracks) {
+        return Arrays.stream(tracks)
+                .flatMap(Arrays::stream)
+                .filter(c -> c.cart != null)
+                .count();
     }
 
     static TrackCoordinate getCartDestinationLocation(final TrackCoordinate cartOriginalLocation, final TrackCoordinate[][] tracks) {
@@ -162,15 +173,15 @@ public class Day13 {
         return tracks[cartOriginalLocation.getY() + facing.getY()][cartOriginalLocation.getX() + facing.getX()];
     }
 
-    static void tick(final TrackCoordinate[][] tracks) {
-        boolean crashDetected = false;
+    static Optional<TrackCoordinate> tick(final TrackCoordinate[][] tracks, final boolean removeCrashedCarts) {
+        Optional<TrackCoordinate> result = Optional.empty();
         final Set<Cart> movedCarts = new HashSet<>();
-        for (int y = 0; y < tracks.length && !crashDetected; y++) {
+        for (int y = 0; y < tracks.length && !result.isPresent(); y++) {
             for (int x = 0; x < tracks[0].length; x++) {
                 final TrackCoordinate coordinate = tracks[y][x];
                 final Cart cart = coordinate.cart;
                 if (cart != null && !movedCarts.contains(cart)) {
-                    // move the cart
+                    // find out where the cart is moving to
                     final TrackCoordinate destination = getCartDestinationLocation(coordinate, tracks);
 
                     if (destination.trackType == TrackType.EMPTY) {
@@ -179,34 +190,46 @@ public class Day13 {
 
                     if (destination.cart != null) {
                         // Crash!
-                        crashDetected = true;
-                        destination.trackType = TrackType.CRASH;
-                        break;
-                    }
-
-                    destination.cart = cart;
-                    coordinate.cart = null;
-
-                    // turn the cart, if necessary
-                    if (destination.trackType == TrackType.INTERSECTION) {
-                        cart.turnAtIntersection();
-                    } else {
-                        final Coordinate facing = cart.facing;
-                        if ((destination.trackType == TrackType.CURVE_LEFT && (facing == DOWN || facing == UP)) || (destination.trackType == TrackType.CURVE_RIGHT && (facing == LEFT || facing == RIGHT))) {
-                            cart.turnLeft();
-                        } else if ((destination.trackType == TrackType.CURVE_LEFT && (facing == LEFT || facing == RIGHT)) || (destination.trackType == TrackType.CURVE_RIGHT && (facing == DOWN || facing == UP))) {
-                            cart.turnRight();
+                        System.out.println("Crash detected at " + destination);
+                        if (removeCrashedCarts) {
+                            coordinate.cart = null;
+                            movedCarts.remove(destination.cart);
+                            destination.cart = null;
+                            if (getCartCount(tracks) == 1) {
+                                result = Optional.of(destination);
+                            }
+                        } else {
+                            result = Optional.of(destination);
+                            destination.trackType = TrackType.CRASH;
+                            break;
                         }
-                    }
+                    } else {
+                        // move the cart
+                        destination.cart = cart;
+                        coordinate.cart = null;
 
-                    movedCarts.add(cart);
+                        // turn the cart, if necessary
+                        if (destination.trackType == TrackType.INTERSECTION) {
+                            cart.turnAtIntersection();
+                        } else {
+                            final Coordinate facing = cart.facing;
+                            if ((destination.trackType == TrackType.CURVE_LEFT && (facing == DOWN || facing == UP)) || (destination.trackType == TrackType.CURVE_RIGHT && (facing == LEFT || facing == RIGHT))) {
+                                cart.turnLeft();
+                            } else if ((destination.trackType == TrackType.CURVE_LEFT && (facing == LEFT || facing == RIGHT)) || (destination.trackType == TrackType.CURVE_RIGHT && (facing == DOWN || facing == UP))) {
+                                cart.turnRight();
+                            }
+                        }
+
+                        movedCarts.add(cart);
+                    }
                 }
             }
         }
+
+        return result;
     }
 
-    static void printTracks(final int tick, final TrackCoordinate[][] tracks) {
-        System.out.println("########### (t = " + tick + ") ###########");
+    static void printTracks(final TrackCoordinate[][] tracks) {
         for (final TrackCoordinate[] row : tracks) {
             final StringBuilder sb = new StringBuilder();
 
@@ -245,14 +268,20 @@ public class Day13 {
 
             System.out.println(sb.toString());
         }
+        System.out.println("   ");
     }
 
     public static void main(String[] args) throws IOException {
         final List<String> rawTrackInput = Utils.read("day13.txt")
                 .collect(Collectors.toList());
 
-        final TrackCoordinate[][] tracks = parseTracks(rawTrackInput);
-        System.out.println(findFirstCrashCoordinate(tracks));
+        TrackCoordinate[][] tracks = parseTracks(rawTrackInput);
+        System.out.println(findFirstCrashCoordinate(tracks, false));
+        System.out.println("   ");
+
+        tracks = parseTracks(rawTrackInput); // reset
+
+        System.out.println(lastCartLocation(tracks));
     }
 
 }

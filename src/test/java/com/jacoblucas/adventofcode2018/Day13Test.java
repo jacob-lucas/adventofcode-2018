@@ -131,17 +131,17 @@ public class Day13Test {
 
         final TrackCoordinate[][] tracks = Day13.parseTracks(example);
 
-        printTracks(0, tracks);
-        tick(tracks);
-        printTracks(1, tracks);
-        tick(tracks);
-        printTracks(2, tracks);
-        tick(tracks);
-        printTracks(3, tracks);
-        tick(tracks);
-        printTracks(4, tracks);
-        tick(tracks);
-        printTracks(5, tracks);
+        printTracks(tracks);
+        tick(tracks, false);
+        printTracks(tracks);
+        tick(tracks, false);
+        printTracks(tracks);
+        tick(tracks, false);
+        printTracks(tracks);
+        tick(tracks, false);
+        printTracks(tracks);
+        tick(tracks, false);
+        printTracks(tracks);
 
         final Cart cart1 = tracks[2][5].getCart();
         assertThat(cart1, is(notNullValue()));
@@ -151,26 +151,24 @@ public class Day13Test {
         assertThat(cart2, is(notNullValue()));
         assertThat(cart2.getFacing(), is(UP));
 
-        tick(tracks);
-        printTracks(6, tracks);
-        tick(tracks);
-        printTracks(7, tracks);
-        tick(tracks);
-        printTracks(8, tracks);
-        tick(tracks);
-        printTracks(9, tracks);
-        tick(tracks);
-        printTracks(10, tracks);
-        tick(tracks);
-        printTracks(11, tracks);
-        tick(tracks);
-        printTracks(12, tracks);
-        tick(tracks);
-        printTracks(13, tracks);
-        tick(tracks);
-        printTracks(14, tracks);
-
-        assertThat(tracks[3][7].getTrackType(), is(CRASH));
+        tick(tracks, false);
+        printTracks(tracks);
+        tick(tracks, false);
+        printTracks(tracks);
+        tick(tracks, false);
+        printTracks(tracks);
+        tick(tracks, false);
+        printTracks(tracks);
+        tick(tracks, false);
+        printTracks(tracks);
+        tick(tracks, false);
+        printTracks(tracks);
+        tick(tracks, false);
+        printTracks(tracks);
+        tick(tracks, false);
+        printTracks(tracks);
+        tick(tracks, false);
+        printTracks(tracks);
     }
 
     @Test
@@ -185,7 +183,43 @@ public class Day13Test {
 
         final TrackCoordinate[][] tracks = Day13.parseTracks(example);
 
-        assertThat(Day13.findFirstCrashCoordinate(tracks), is(new TrackCoordinate(7, 3, CRASH, null)));
+        final TrackCoordinate crashCoordinate = Day13.findFirstCrashCoordinate(tracks, false);
+        assertThat(crashCoordinate.getX(), is(7));
+        assertThat(crashCoordinate.getY(), is(3));
+    }
+
+    @Test
+    public void testGetCartCount() {
+        final List<String> example = Arrays.asList(
+                "/>-<\\  ",
+                "|   |  ",
+                "| /<+-\\",
+                "| | | v",
+                "\\>+</ |",
+                "  |   ^",
+                "  \\<->/");
+
+        final TrackCoordinate[][] tracks = Day13.parseTracks(example);
+
+        assertThat(Day13.getCartCount(tracks), is(9L));
+    }
+
+    @Test
+    public void testLastCartLocation() {
+        final List<String> example = Arrays.asList(
+                "/>-<\\  ",
+                "|   |  ",
+                "| /<+-\\",
+                "| | | v",
+                "\\>+</ |",
+                "  |   ^",
+                "  \\<->/");
+
+        final TrackCoordinate[][] tracks = Day13.parseTracks(example);
+
+        final TrackCoordinate lastCartLocation = Day13.lastCartLocation(tracks);
+        assertThat(lastCartLocation.getX(), is(6));
+        assertThat(lastCartLocation.getY(), is(4));
     }
 
 }
