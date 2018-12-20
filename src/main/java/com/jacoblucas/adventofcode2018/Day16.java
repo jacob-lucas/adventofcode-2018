@@ -7,11 +7,13 @@ import lombok.Data;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Day16 {
 
@@ -26,16 +28,6 @@ public class Day16 {
                 .mapToInt(Register::getValue)
                 .toArray();
     }
-
-    static final Opcode[] opcodes = new Opcode[]{
-            new addr(), new addi(),
-            new mulr(), new muli(),
-            new banr(), new bani(),
-            new borr(), new bori(),
-            new setr(), new seti(),
-            new gtir(), new gtri(), new gtrr(),
-            new eqir(), new eqri(), new eqrr()
-    };
 
     @Data
     @AllArgsConstructor
@@ -60,6 +52,13 @@ public class Day16 {
         @Override
         public String toString() {
             return "opcode=" + opcode + " A=" + inputA + " B=" + inputB + " Out=R" + output;
+        }
+
+        static Instruction parse(final String instructionStr) {
+            int[] ip = Arrays.stream(instructionStr.split(" "))
+                    .mapToInt(Integer::valueOf)
+                    .toArray();
+            return new Instruction(ip[0], ip[1], ip[2], ip[3]);
         }
     }
 
@@ -95,11 +94,6 @@ public class Day16 {
                     .mapToInt(Integer::valueOf)
                     .toArray();
 
-            int[] ip = Arrays.stream(instructionStr.split(" "))
-                    .mapToInt(Integer::valueOf)
-                    .toArray();
-            Instruction instruction = new Instruction(ip[0], ip[1], ip[2], ip[3]);
-
             String[] ap = afterStr.split(":");
             int[] after = Arrays.stream(ap[1].trim()
                     .replaceAll("\\[", "")
@@ -109,13 +103,28 @@ public class Day16 {
                     .mapToInt(Integer::valueOf)
                     .toArray();
 
-            return new Sample(before, instruction, after);
+            return new Sample(before, Instruction.parse(instructionStr), after);
         }
     }
+
+    static final Opcode[] opcodes = new Opcode[]{
+            new addr(), new addi(),
+            new mulr(), new muli(),
+            new banr(), new bani(),
+            new borr(), new bori(),
+            new setr(), new seti(),
+            new gtir(), new gtri(), new gtrr(),
+            new eqir(), new eqri(), new eqrr()
+    };
 
     abstract static class Opcode {
         String name() {
             return this.getClass().getSimpleName();
+        }
+
+        @Override
+        public String toString() {
+            return name();
         }
 
         abstract int[] apply(final int[] input, Instruction instruction);
@@ -125,6 +134,45 @@ public class Day16 {
             r1.setValue(input[1]);
             r2.setValue(input[2]);
             r3.setValue(input[3]);
+        }
+
+        static Opcode get(final String name) {
+            switch (name) {
+                case "addr":
+                    return opcodes[0];
+                case "addi":
+                    return opcodes[1];
+                case "mulr":
+                    return opcodes[2];
+                case "muli":
+                    return opcodes[3];
+                case "banr":
+                    return opcodes[4];
+                case "bani":
+                    return opcodes[5];
+                case "borr":
+                    return opcodes[6];
+                case "bori":
+                    return opcodes[7];
+                case "setr":
+                    return opcodes[8];
+                case "seti":
+                    return opcodes[9];
+                case "gtir":
+                    return opcodes[10];
+                case "gtri":
+                    return opcodes[11];
+                case "gtrr":
+                    return opcodes[12];
+                case "eqir":
+                    return opcodes[13];
+                case "eqri":
+                    return opcodes[14];
+                case "eqrr":
+                    return opcodes[15];
+                default:
+                    return null;
+            }
         }
     }
 
@@ -281,27 +329,76 @@ public class Day16 {
                 .collect(Collectors.toMap(Function.identity(), Sample::findMatchingOpcodes));
     }
 
+    private static Map<Integer, Opcode> identifyFromSamples(final Map<Sample, List<String>> matchingOpcodesForSamples) {
+        final Map<Integer, Opcode> identifiedOpcodes = new HashMap<>();
+
+        final List<Opcode> unidentifiedOpcodes = Arrays.stream(opcodes).collect(Collectors.toList());
+        while (!unidentifiedOpcodes.isEmpty()) {
+            // find all samples with 1 matching opcode
+            final Stream<Map.Entry<Sample, List<String>>> identifiableSamples = matchingOpcodesForSamples.entrySet().stream()
+                    .filter(e -> e.getValue().size() == 1);
+
+            final Map<Integer, String> idToNameMap = new HashMap<>();
+            identifiableSamples.forEach(e -> idToNameMap.put(e.getKey().instruction.opcode, e.getValue().get(0)));
+
+            idToNameMap.forEach((id, name) -> {
+                // mark each entry in the map as identified
+                final Opcode identifiedOpcode = Opcode.get(name);
+                identifiedOpcodes.put(id, identifiedOpcode);
+                unidentifiedOpcodes.remove(identifiedOpcode);
+
+                // remove this entry from matchingOpcodesForSamplesMap
+                for (Map.Entry<Sample, List<String>> entry : matchingOpcodesForSamples.entrySet()) {
+                    entry.getValue().remove(name);
+                }
+            });
+        }
+
+        return identifiedOpcodes;
+    }
+
     public static void main(String[] args) throws IOException {
         int blankLineCount = 0;
         final Iterator<String> iterator = Utils.read("day16.txt").iterator();
         final List<Sample> samples = new ArrayList<>();
+        final List<Instruction> instructions = new ArrayList<>();
+        boolean parsingInstructions = false;
         while (iterator.hasNext()) {
-            final String before = iterator.next();
-            if (!before.isEmpty()) {
-                blankLineCount = 0;
-                final String instruction = iterator.next();
-                final String after = iterator.next();
-                samples.add(Sample.parse(before, instruction, after));
+            if (parsingInstructions) {
+                instructions.add(Instruction.parse(iterator.next()));
             } else {
-                blankLineCount++;
-                if (blankLineCount == 3) {
-                    break; // no more sample data
+                final String before = iterator.next();
+                if (!before.isEmpty()) {
+                    blankLineCount = 0;
+                    final String instruction = iterator.next();
+                    final String after = iterator.next();
+                    samples.add(Sample.parse(before, instruction, after));
+                } else {
+                    blankLineCount++;
+                    if (blankLineCount == 3) {
+                        parsingInstructions = true; // no more sample data
+                    }
                 }
             }
         }
 
         final Map<Sample, List<String>> matchingOpcodesForSamples = findMatchingOpcodesForSamples(samples);
         System.out.println(matchingOpcodesForSamples.entrySet().stream().filter(e -> e.getValue().size() >= 3).count());
+
+        final Map<Integer, Opcode> idToOpcodeMap = identifyFromSamples(matchingOpcodesForSamples);
+
+        r0.setValue(0);
+        r1.setValue(0);
+        r2.setValue(0);
+        r3.setValue(0);
+
+        // execute all instructions
+        instructions.forEach(i -> {
+            final Opcode opcode = idToOpcodeMap.get(i.opcode);
+            opcode.apply(registerValues(), i);
+        });
+
+        System.out.println(Arrays.toString(registerValues()));
     }
 
 }
