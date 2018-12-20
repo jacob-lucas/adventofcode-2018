@@ -8,9 +8,6 @@ import org.junit.Test;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.jacoblucas.adventofcode2018.Day13.DOWN;
-import static com.jacoblucas.adventofcode2018.Day13.LEFT;
-import static com.jacoblucas.adventofcode2018.Day13.RIGHT;
 import static com.jacoblucas.adventofcode2018.Day13.TrackCoordinate.parse;
 import static com.jacoblucas.adventofcode2018.Day13.TrackType.CRASH;
 import static com.jacoblucas.adventofcode2018.Day13.TrackType.CURVE_LEFT;
@@ -19,9 +16,12 @@ import static com.jacoblucas.adventofcode2018.Day13.TrackType.EMPTY;
 import static com.jacoblucas.adventofcode2018.Day13.TrackType.HORIZONTAL;
 import static com.jacoblucas.adventofcode2018.Day13.TrackType.INTERSECTION;
 import static com.jacoblucas.adventofcode2018.Day13.TrackType.VERTICAL;
-import static com.jacoblucas.adventofcode2018.Day13.UP;
 import static com.jacoblucas.adventofcode2018.Day13.printTracks;
 import static com.jacoblucas.adventofcode2018.Day13.tick;
+import static com.jacoblucas.adventofcode2018.common.Coordinate.E;
+import static com.jacoblucas.adventofcode2018.common.Coordinate.N;
+import static com.jacoblucas.adventofcode2018.common.Coordinate.S;
+import static com.jacoblucas.adventofcode2018.common.Coordinate.W;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
@@ -38,10 +38,10 @@ public class Day13Test {
         assertThat(parse(x, y, '\\'), is(new TrackCoordinate(x, y, CURVE_LEFT, null)));
         assertThat(parse(x, y, ' '), is(new TrackCoordinate(x, y, EMPTY, null)));
 
-        assertThat(parse(x, y, '^'), is(new TrackCoordinate(x, y, VERTICAL, new Cart(UP))));
-        assertThat(parse(x, y, 'v'), is(new TrackCoordinate(x, y, VERTICAL, new Cart(DOWN))));
-        assertThat(parse(x, y, '<'), is(new TrackCoordinate(x, y, HORIZONTAL, new Cart(LEFT))));
-        assertThat(parse(x, y, '>'), is(new TrackCoordinate(x, y, HORIZONTAL, new Cart(RIGHT))));
+        assertThat(parse(x, y, '^'), is(new TrackCoordinate(x, y, VERTICAL, new Cart(N))));
+        assertThat(parse(x, y, 'v'), is(new TrackCoordinate(x, y, VERTICAL, new Cart(S))));
+        assertThat(parse(x, y, '<'), is(new TrackCoordinate(x, y, HORIZONTAL, new Cart(W))));
+        assertThat(parse(x, y, '>'), is(new TrackCoordinate(x, y, HORIZONTAL, new Cart(E))));
         assertThat(parse(x, y, 'X'), is(new TrackCoordinate(x, y, CRASH, null)));
     }
 
@@ -75,8 +75,8 @@ public class Day13Test {
 
         final TrackCoordinate[][] otherTracks = Day13.parseTracks(otherRawTrackInput);
 
-        assertThat(otherTracks[1][0], is(new TrackCoordinate(0, 1, VERTICAL, new Cart(DOWN))));
-        assertThat(otherTracks[4][6], is(new TrackCoordinate(6, 4, VERTICAL, new Cart(UP))));
+        assertThat(otherTracks[1][0], is(new TrackCoordinate(0, 1, VERTICAL, new Cart(S))));
+        assertThat(otherTracks[4][6], is(new TrackCoordinate(6, 4, VERTICAL, new Cart(N))));
         assertThat(otherTracks[3][12], is(new TrackCoordinate(12, 3, CRASH, null)));
     }
 
@@ -145,11 +145,11 @@ public class Day13Test {
 
         final Cart cart1 = tracks[2][5].getCart();
         assertThat(cart1, is(notNullValue()));
-        assertThat(cart1.getFacing(), is(RIGHT));
+        assertThat(cart1.getFacing(), is(E));
 
         final Cart cart2 = tracks[3][12].getCart();
         assertThat(cart2, is(notNullValue()));
-        assertThat(cart2.getFacing(), is(UP));
+        assertThat(cart2.getFacing(), is(N));
 
         tick(tracks, false);
         printTracks(tracks);

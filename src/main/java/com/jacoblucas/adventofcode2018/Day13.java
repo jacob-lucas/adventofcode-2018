@@ -17,12 +17,12 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-public class Day13 {
+import static com.jacoblucas.adventofcode2018.common.Coordinate.E;
+import static com.jacoblucas.adventofcode2018.common.Coordinate.N;
+import static com.jacoblucas.adventofcode2018.common.Coordinate.S;
+import static com.jacoblucas.adventofcode2018.common.Coordinate.W;
 
-    static final Coordinate UP = new Coordinate(0, -1);
-    static final Coordinate DOWN = new Coordinate(0, 1);
-    static final Coordinate LEFT = new Coordinate(-1, 0);
-    static final Coordinate RIGHT = new Coordinate(1, 0);
+public class Day13 {
 
     @Data
     @RequiredArgsConstructor
@@ -32,19 +32,19 @@ public class Day13 {
         @NonNull private Coordinate facing;
 
         void turnLeft() {
-            turn(RIGHT, LEFT, DOWN, UP);
+            turn(E, W, S, N);
         }
 
         void turnRight() {
-            turn(LEFT, RIGHT, UP, DOWN);
+            turn(W, E, N, S);
         }
 
         private void turn(final Coordinate left, final Coordinate right, final Coordinate up, final Coordinate down) {
-            if (facing == DOWN) {
+            if (facing == S) {
                 facing = left;
-            } else if (facing == UP) {
+            } else if (facing == N) {
                 facing = right;
-            } else if (facing == LEFT) {
+            } else if (facing == W) {
                 facing = up;
             } else {
                 facing = down;
@@ -102,16 +102,16 @@ public class Day13 {
             } else if (ch == '+') {
                 trackType = TrackType.INTERSECTION;
             } else if (ch == '^') {
-                cart = new Cart(UP);
+                cart = new Cart(N);
                 trackType = TrackType.VERTICAL;
             } else if (ch == 'v') {
-                cart = new Cart(DOWN);
+                cart = new Cart(S);
                 trackType = TrackType.VERTICAL;
             } else if (ch == '>') {
-                cart = new Cart(RIGHT);
+                cart = new Cart(E);
                 trackType = TrackType.HORIZONTAL;
             } else if (ch == '<') {
-                cart = new Cart(LEFT);
+                cart = new Cart(W);
                 trackType = TrackType.HORIZONTAL;
             } else if (ch == ' ') {
                 trackType = TrackType.EMPTY;
@@ -213,9 +213,9 @@ public class Day13 {
                             cart.turnAtIntersection();
                         } else {
                             final Coordinate facing = cart.facing;
-                            if ((destination.trackType == TrackType.CURVE_LEFT && (facing == DOWN || facing == UP)) || (destination.trackType == TrackType.CURVE_RIGHT && (facing == LEFT || facing == RIGHT))) {
+                            if ((destination.trackType == TrackType.CURVE_LEFT && (facing == S || facing == N)) || (destination.trackType == TrackType.CURVE_RIGHT && (facing == W || facing == E))) {
                                 cart.turnLeft();
-                            } else if ((destination.trackType == TrackType.CURVE_LEFT && (facing == LEFT || facing == RIGHT)) || (destination.trackType == TrackType.CURVE_RIGHT && (facing == DOWN || facing == UP))) {
+                            } else if ((destination.trackType == TrackType.CURVE_LEFT && (facing == W || facing == E)) || (destination.trackType == TrackType.CURVE_RIGHT && (facing == S || facing == N))) {
                                 cart.turnRight();
                             }
                         }
@@ -240,11 +240,11 @@ public class Day13 {
                             sb.append("X");
                         } else if (cart != null) {
                             final Coordinate facing = cart.facing;
-                            if (facing == UP) {
+                            if (facing == N) {
                                 sb.append("^");
-                            } else if (facing == DOWN) {
+                            } else if (facing == S) {
                                 sb.append("v");
-                            } else if (facing == LEFT) {
+                            } else if (facing == W) {
                                 sb.append("<");
                             } else {
                                 sb.append(">");
