@@ -9,6 +9,10 @@ import java.util.Map;
 
 import static com.jacoblucas.adventofcode2018.Day16.Opcode;
 import static com.jacoblucas.adventofcode2018.Day16.opcodes;
+import static com.jacoblucas.adventofcode2018.Day16.r0;
+import static com.jacoblucas.adventofcode2018.Day16.r1;
+import static com.jacoblucas.adventofcode2018.Day16.r2;
+import static com.jacoblucas.adventofcode2018.Day16.r3;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -47,8 +51,12 @@ public class Day16Test {
         expected.put(opcodes[15], new int[]{3, 2, 0, 1}); // eqrr
 
         for (Map.Entry<Opcode, int[]> e : expected.entrySet()) {
+            r0.setValue(before[0]);
+            r1.setValue(before[1]);
+            r2.setValue(before[2]);
+            r3.setValue(before[3]);
             final Opcode opcode = e.getKey();
-            assertThat(opcode.name() + " did not produce the correct output", opcode.apply(before, instruction), is(e.getValue()));
+            assertThat(opcode.name() + " did not produce the correct output", opcode.apply(instruction), is(e.getValue()));
         }
     }
 

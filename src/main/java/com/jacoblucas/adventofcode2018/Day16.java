@@ -17,11 +17,11 @@ import java.util.stream.Stream;
 
 public class Day16 {
 
-    private static final Register r0 = new Register(0, 0);
-    private static final Register r1 = new Register(1, 0);
-    private static final Register r2 = new Register(2, 0);
-    private static final Register r3 = new Register(3, 0);
-    private static final Register[] registers = new Register[]{r0, r1, r2, r3};
+    static final Register r0 = new Register(0, 0);
+    static final Register r1 = new Register(1, 0);
+    static final Register r2 = new Register(2, 0);
+    static final Register r3 = new Register(3, 0);
+    static final Register[] registers = new Register[]{r0, r1, r2, r3};
 
     private static int[] registerValues() {
         return Arrays.stream(registers)
@@ -76,7 +76,13 @@ public class Day16 {
 
         List<String> findMatchingOpcodes() {
             return Arrays.stream(opcodes)
-                    .collect(Collectors.toMap(Function.identity(), opcode -> opcode.apply(beforeRegisterValues, instruction)))
+                    .collect(Collectors.toMap(Function.identity(), opcode -> {
+                        r0.setValue(beforeRegisterValues[0]);
+                        r1.setValue(beforeRegisterValues[1]);
+                        r2.setValue(beforeRegisterValues[2]);
+                        r3.setValue(beforeRegisterValues[3]);
+                        return opcode.apply(instruction);
+                    }))
                     .entrySet()
                     .stream()
                     .filter(e -> Arrays.equals(e.getValue(), afterRegisterValues))
@@ -118,6 +124,9 @@ public class Day16 {
     };
 
     abstract static class Opcode {
+
+        abstract int[] apply(final Instruction instruction);
+
         String name() {
             return this.getClass().getSimpleName();
         }
@@ -125,15 +134,6 @@ public class Day16 {
         @Override
         public String toString() {
             return name();
-        }
-
-        abstract int[] apply(final int[] input, Instruction instruction);
-
-        void setRegisterValuesFromInput(final int[] input) {
-            r0.setValue(input[0]);
-            r1.setValue(input[1]);
-            r2.setValue(input[2]);
-            r3.setValue(input[3]);
         }
 
         static Opcode get(final String name) {
@@ -179,8 +179,7 @@ public class Day16 {
     // stores into register C the result of adding register A and register B.
     static class addr extends Opcode {
         @Override
-        int[] apply(int[] input, Instruction instruction) {
-            setRegisterValuesFromInput(input);
+        int[] apply(final Instruction instruction) {
             registers[instruction.output].setValue(registers[instruction.inputA].getValue() + registers[instruction.inputB].getValue());
             return registerValues();
         }
@@ -189,8 +188,7 @@ public class Day16 {
     // stores into register C the result of adding register A and value B.
     static class addi extends Opcode {
         @Override
-        int[] apply(int[] input, Instruction instruction) {
-            setRegisterValuesFromInput(input);
+        int[] apply(final Instruction instruction) {
             registers[instruction.output].setValue(registers[instruction.inputA].getValue() + instruction.inputB);
             return registerValues();
         }
@@ -199,8 +197,7 @@ public class Day16 {
     // stores into register C the result of multiplying register A and register B.
     static class mulr extends Opcode {
         @Override
-        int[] apply(int[] input, Instruction instruction) {
-            setRegisterValuesFromInput(input);
+        int[] apply(final Instruction instruction) {
             registers[instruction.output].setValue(registers[instruction.inputA].getValue() * registers[instruction.inputB].getValue());
             return registerValues();
         }
@@ -209,8 +206,7 @@ public class Day16 {
     // stores into register C the result of multiplying register A and value B.
     static class muli extends Opcode {
         @Override
-        int[] apply(int[] input, Instruction instruction) {
-            setRegisterValuesFromInput(input);
+        int[] apply(final Instruction instruction) {
             registers[instruction.output].setValue(registers[instruction.inputA].getValue() * instruction.inputB);
             return registerValues();
         }
@@ -218,8 +214,7 @@ public class Day16 {
 
     static class banr extends Opcode {
         @Override
-        int[] apply(int[] input, Instruction instruction) {
-            setRegisterValuesFromInput(input);
+        int[] apply(final Instruction instruction) {
             registers[instruction.output].setValue(registers[instruction.inputA].getValue() & registers[instruction.inputB].getValue());
             return registerValues();
         }
@@ -227,8 +222,7 @@ public class Day16 {
 
     static class bani extends Opcode {
         @Override
-        int[] apply(int[] input, Instruction instruction) {
-            setRegisterValuesFromInput(input);
+        int[] apply(final Instruction instruction) {
             registers[instruction.output].setValue(registers[instruction.inputA].getValue() & instruction.inputB);
             return registerValues();
         }
@@ -236,8 +230,7 @@ public class Day16 {
 
     static class borr extends Opcode {
         @Override
-        int[] apply(int[] input, Instruction instruction) {
-            setRegisterValuesFromInput(input);
+        int[] apply(final Instruction instruction) {
             registers[instruction.output].setValue(registers[instruction.inputA].getValue() | registers[instruction.inputB].getValue());
             return registerValues();
         }
@@ -245,8 +238,7 @@ public class Day16 {
 
     static class bori extends Opcode {
         @Override
-        int[] apply(int[] input, Instruction instruction) {
-            setRegisterValuesFromInput(input);
+        int[] apply(final Instruction instruction) {
             registers[instruction.output].setValue(registers[instruction.inputA].getValue() | instruction.inputB);
             return registerValues();
         }
@@ -254,8 +246,7 @@ public class Day16 {
 
     static class setr extends Opcode {
         @Override
-        int[] apply(int[] input, Instruction instruction) {
-            setRegisterValuesFromInput(input);
+        int[] apply(final Instruction instruction) {
             registers[instruction.output].setValue(registers[instruction.inputA].getValue());
             return registerValues();
         }
@@ -263,8 +254,7 @@ public class Day16 {
 
     static class seti extends Opcode {
         @Override
-        int[] apply(int[] input, Instruction instruction) {
-            setRegisterValuesFromInput(input);
+        int[] apply(final Instruction instruction) {
             registers[instruction.output].setValue(instruction.inputA);
             return registerValues();
         }
@@ -272,8 +262,7 @@ public class Day16 {
 
     static class gtir extends Opcode {
         @Override
-        int[] apply(int[] input, Instruction instruction) {
-            setRegisterValuesFromInput(input);
+        int[] apply(final Instruction instruction) {
             registers[instruction.output].setValue(instruction.inputA > registers[instruction.inputB].getValue() ? 1 : 0);
             return registerValues();
         }
@@ -281,8 +270,7 @@ public class Day16 {
 
     static class gtri extends Opcode {
         @Override
-        int[] apply(int[] input, Instruction instruction) {
-            setRegisterValuesFromInput(input);
+        int[] apply(final Instruction instruction) {
             registers[instruction.output].setValue(registers[instruction.inputA].getValue() > instruction.inputB ? 1 : 0);
             return registerValues();
         }
@@ -290,8 +278,7 @@ public class Day16 {
 
     static class gtrr extends Opcode {
         @Override
-        int[] apply(int[] input, Instruction instruction) {
-            setRegisterValuesFromInput(input);
+        int[] apply(final Instruction instruction) {
             registers[instruction.output].setValue(registers[instruction.inputA].getValue() > registers[instruction.inputB].getValue() ? 1 : 0);
             return registerValues();
         }
@@ -299,8 +286,7 @@ public class Day16 {
 
     static class eqir extends Opcode {
         @Override
-        int[] apply(int[] input, Instruction instruction) {
-            setRegisterValuesFromInput(input);
+        int[] apply(final Instruction instruction) {
             registers[instruction.output].setValue(instruction.inputA == registers[instruction.inputB].getValue() ? 1 : 0);
             return registerValues();
         }
@@ -308,8 +294,7 @@ public class Day16 {
 
     static class eqri extends Opcode {
         @Override
-        int[] apply(int[] input, Instruction instruction) {
-            setRegisterValuesFromInput(input);
+        int[] apply(final Instruction instruction) {
             registers[instruction.output].setValue(registers[instruction.inputA].getValue() == instruction.inputB ? 1 : 0);
             return registerValues();
         }
@@ -317,16 +302,14 @@ public class Day16 {
 
     static class eqrr extends Opcode {
         @Override
-        int[] apply(int[] input, Instruction instruction) {
-            setRegisterValuesFromInput(input);
+        int[] apply(final Instruction instruction) {
             registers[instruction.output].setValue(registers[instruction.inputA].getValue() == registers[instruction.inputB].getValue() ? 1 : 0);
             return registerValues();
         }
     }
 
     public static Map<Sample, List<String>> findMatchingOpcodesForSamples(final List<Sample> samples) {
-        return samples.stream()
-                .collect(Collectors.toMap(Function.identity(), Sample::findMatchingOpcodes));
+        return samples.stream().collect(Collectors.toMap(Function.identity(), Sample::findMatchingOpcodes));
     }
 
     private static Map<Integer, Opcode> identifyFromSamples(final Map<Sample, List<String>> matchingOpcodesForSamples) {
@@ -393,10 +376,7 @@ public class Day16 {
         r3.setValue(0);
 
         // execute all instructions
-        instructions.forEach(i -> {
-            final Opcode opcode = idToOpcodeMap.get(i.opcode);
-            opcode.apply(registerValues(), i);
-        });
+        instructions.forEach(i -> idToOpcodeMap.get(i.opcode).apply(i));
 
         System.out.println(Arrays.toString(registerValues()));
     }
