@@ -18,6 +18,7 @@ import static com.jacoblucas.adventofcode2018.Day18.parseField;
 import static com.jacoblucas.adventofcode2018.Day18.totalResourceValue;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 
 public class Day18Test {
@@ -89,40 +90,37 @@ public class Day18Test {
         Acre acre = exampleField[0][1];
         assertThat(acre.getAcreType(), is(LUMBERYARD));
         acre.iterate(exampleField);
-        assertThat(acre.getAcreType(), is(OPEN_GROUND));
-        acre.setAcreType(LUMBERYARD);
+        assertThat(acre.getNextAcreType(), is(OPEN_GROUND));
 
         // lumberyard -> lumberyard
         acre = exampleField[0][8];
         assertThat(acre.getAcreType(), is(LUMBERYARD));
         acre.iterate(exampleField);
-        assertThat(acre.getAcreType(), is(LUMBERYARD));
+        assertThat(acre.getNextAcreType(), is(nullValue()));
 
         // open -> trees
         acre = exampleField[6][0];
         assertThat(acre.getAcreType(), is(OPEN_GROUND));
         acre.iterate(exampleField);
-        assertThat(acre.getAcreType(), is(TREES));
-        acre.setAcreType(OPEN_GROUND);
+        assertThat(acre.getNextAcreType(), is(TREES));
 
         // open -> open
         acre = exampleField[0][0];
         assertThat(acre.getAcreType(), is(OPEN_GROUND));
         acre.iterate(exampleField);
-        assertThat(acre.getAcreType(), is(OPEN_GROUND));
+        assertThat(acre.getNextAcreType(), is(nullValue()));
 
         // trees -> lumberyard
         acre = exampleField[0][7];
         assertThat(acre.getAcreType(), is(TREES));
         acre.iterate(exampleField);
-        assertThat(acre.getAcreType(), is(LUMBERYARD));
-        acre.setAcreType(TREES);
+        assertThat(acre.getNextAcreType(), is(LUMBERYARD));
 
         // trees -> trees
         acre = exampleField[1][6];
         assertThat(acre.getAcreType(), is(TREES));
         acre.iterate(exampleField);
-        assertThat(acre.getAcreType(), is(TREES));
+        assertThat(acre.getNextAcreType(), is(nullValue()));
     }
 
     @Test

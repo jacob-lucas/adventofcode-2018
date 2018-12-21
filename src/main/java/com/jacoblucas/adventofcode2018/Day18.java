@@ -51,14 +51,12 @@ public class Day18 {
     @EqualsAndHashCode(callSuper = true)
     static class Acre extends Coordinate {
         @Getter @Setter(AccessLevel.PACKAGE) private AcreType acreType;
+        @Getter @Setter(AccessLevel.PACKAGE) private AcreType nextAcreType;
 
         public Acre(final int x, final int y, final AcreType acreType) {
             super(x, y);
             this.acreType = acreType;
-        }
-
-        public static Acre copy(final Acre original) {
-            return new Acre(original.getX(), original.getY(), original.getAcreType());
+            this.nextAcreType = null;
         }
 
         public Stream<Acre> getAdjacentAcres(final Acre[][] field) {
@@ -79,14 +77,14 @@ public class Day18 {
                         .map(c -> field[c.getY()][c.getX()])
                         .filter(a -> a.acreType == AcreType.TREES)
                         .count() >= 3) {
-                    acreType = AcreType.TREES;
+                    nextAcreType = AcreType.TREES;
                 }
             } else if (acreType == AcreType.TREES) {
                 if (adjacentAcres
                         .map(c -> field[c.getY()][c.getX()])
                         .filter(a -> a.acreType == AcreType.LUMBERYARD)
                         .count() >= 3) {
-                    acreType = AcreType.LUMBERYARD;
+                    nextAcreType = AcreType.LUMBERYARD;
                 }
             } else if (acreType == AcreType.LUMBERYARD) {
                 if (adjacentAcres
@@ -95,11 +93,18 @@ public class Day18 {
                         .filter(at -> at == AcreType.TREES || at == AcreType.LUMBERYARD)
                         .distinct()
                         .count() < 2) {
-                    acreType = AcreType.OPEN_GROUND;
+                    nextAcreType = AcreType.OPEN_GROUND;
                 }
             }
 
             return this;
+        }
+
+        public void flip() {
+            if (nextAcreType != null) {
+                acreType = nextAcreType;
+                nextAcreType = null;
+            }
         }
 
         @Override
@@ -161,17 +166,15 @@ public class Day18 {
     }
 
     private static void iterate(Acre[][] field) {
-        final Acre[][] iteratedField = new Acre[field.length][field[0].length];
         for (int y = 0; y < field.length; y++) {
             for (int x = 0; x < field[y].length; x++) {
-                final Acre current = field[y][x];
-                iteratedField[y][x] = Acre.copy(current).iterate(field);
+                field[y][x].iterate(field);
             }
         }
 
         for (int y = 0; y < field.length; y++) {
-            if (field[y].length >= 0) {
-                System.arraycopy(iteratedField[y], 0, field[y], 0, field[y].length);
+            for (int x = 0; x < field[y].length; x++) {
+                field[y][x].flip();
             }
         }
     }
