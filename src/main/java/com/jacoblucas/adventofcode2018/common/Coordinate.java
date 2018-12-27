@@ -47,4 +47,5 @@ public class Coordinate {
             return Optional.empty();
         }
     }
+
 }
