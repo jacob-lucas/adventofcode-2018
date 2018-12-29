@@ -1,6 +1,7 @@
 package com.jacoblucas.adventofcode2018;
 
 import com.jacoblucas.adventofcode2018.common.Coordinate;
+import com.jacoblucas.adventofcode2018.common.Pair;
 import com.jacoblucas.adventofcode2018.utils.Utils;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -9,9 +10,12 @@ import java.io.IOException;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.PriorityQueue;
 import java.util.stream.Collectors;
 
 public class Day23 {
+
+    private static final ThreeDimensionalCoordinate ORIGIN = new ThreeDimensionalCoordinate(0,0,0);
 
     @Data
     @EqualsAndHashCode(callSuper = true)
@@ -77,6 +81,30 @@ public class Day23 {
         }
     }
 
+    static int distanceToHighestInRangeCoordinate(final List<Nanobot> nanobots) {
+        final PriorityQueue<Pair<Integer, Integer>> q = new PriorityQueue<>(Comparator.comparingInt(Pair::getLeft));
+        nanobots.forEach(n -> {
+            final int distanceFromZero = ORIGIN.manhattanDistance(n.getPos());
+            q.add(Pair.of(Math.max(0, distanceFromZero - n.getRadius()), 1));
+            q.add(Pair.of(distanceFromZero + n.getRadius() + 1, -1));
+        });
+
+        int count = 0;
+        int maxCount = 0;
+        int result = 0;
+
+        while (!q.isEmpty()) {
+            final Pair<Integer, Integer> p = q.poll();
+            count += p.getRight();
+            if (count > maxCount) {
+                result = p.getLeft();
+                maxCount = count;
+            }
+        }
+
+        return result;
+    }
+
     public static void main(String[] args) throws IOException {
         final List<Nanobot> nanobots = Utils.read("day23.txt")
                 .map(Nanobot::parse)
@@ -88,6 +116,7 @@ public class Day23 {
                 .get();
 
         System.out.println(strongest.getNanobotsInRange(nanobots).size());
+        System.out.println(distanceToHighestInRangeCoordinate(nanobots));
     }
 
 }
